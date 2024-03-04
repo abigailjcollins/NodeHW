@@ -1,13 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-const Blog = require('./models/blog');
+
+const blogRoutes = require('./routes/blogRoutes');
 
 // express app
 const app = express();
 
 // register view engine
-app.set('view engine', 'ejs');
 
 // connect to mongoDB
 const dbURI = 'mongodb+srv://abigailjcollins:OujfZKO68Ftyb78z@nodetuts.7qlsgem.mongodb.net/'
@@ -17,13 +17,13 @@ mongoose.connect(dbURI)
 
 
 
+    app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
-
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // register view engine
-app.set('view engine', 'ejs');
 
 // app.use((req, res, next) => {
 //     console.log('in the next middleware');
@@ -41,46 +41,46 @@ app.set('view engine', 'ejs');
 // })
 
 // mongoose and mongo sandbox routes
-app.get('/add-blog', (req, res) =>{
-const blog = new Blog({
-    title: 'new blog',
-    snippet: 'about my new blog',
-    body: 'more about my new blog'
-});
-blog.save()
-    .then((result) =>{
-        res.send(result)
-    })
-    .catch((err) =>{
-        console.log(err)
-    });
-});
+// app.get('/add-blog', (req, res) =>{
+// const blog = new Blog({
+//     title: 'new blog 2',
+//     snippet: 'about my new blog',
+//     body: 'more about my new blog'
+// });
+// blog.save()
+//     .then((result) =>{
+//         res.send(result)
+//     })
+//     .catch((err) =>{
+//         console.log(err)
+//     });
+// });
 
-app.get('/single-blog', (req, res) =>{
-    Blog.findById()
-})
+// app.get('/single-blog', (req, res) =>{
+//     Blog.findById("65e5df0a872f9a466b4196cb")
+//     .then((result) =>{
+//         res.send(result)
+//     })
+//     .catch((err) =>{
+//         console.log(err)
+//     });
+// })
 
-app.get('/all-blogs', (req, res) =>{
-    Blog.find()
-    .then((result) =>{
-        res.send(result);
-    })
-    .catch((err) =>{
-        console.log(err)
-    });
-})
+// app.get('/all-blogs', (req, res) =>{
+//     Blog.find()
+//     .then((result) =>{
+//         res.send(result);
+//     })
+//     .catch((err) =>{
+//         console.log(err)
+//     });
+// })
 
 
 
 // routing
 app.get('/', (req, res) =>{
-    const blogs = [
-        {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-      ];
-    
-    res.render('index', {title: 'Home', blogs})
+   res.redirect('/blogs')
     // res.send('<p> Home Page </p>');
     // res.sendFile('./views/index.html', {root: __dirname});
 });
@@ -91,11 +91,13 @@ app.get('/about', (req, res) =>{
     // res.sendFile('./views/about.html', {root: __dirname});
 });
 
+
+// blog routes
+app.use("/blogs", blogRoutes)
+
+
 // redirects
-app.get('/blogs/create', (req, res) =>{
-    res.render('create', {title: "Create a Blog"})
-        // res.redirect('/about');
-});
+
 
 // 404 page
 app.use((req, res) =>{
